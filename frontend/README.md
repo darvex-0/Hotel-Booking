@@ -1,40 +1,48 @@
-# Hotel Room Booking System (Frontend)
+# 🏖️ Beach Resort - Guest Portal
 
-## Frontend Flowchart
+The user-facing web portal for Beach Resort guests. Built with Next.js, it offers a premium, fast, and responsive experience for discovering and booking luxury rooms.
 
-![Frontend Flowchart](https://raw.githubusercontent.com/SamiurRahmanMukul/Hotel-Room-Booking-System/main/frontend-flowchart.drawio.png)
+## ✨ Features
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+- **Premium Design**: Modern, responsive UI with glassmorphism and smooth transitions.
+- **Dynamic Filtering**: Real-time room filtering by type, capacity, price, and amenities.
+- **Booking Flow**: Seamless reservation process with date validation.
+- **User Dashboard**: Manage profiles, view booking history, and leave reviews.
+- **SEO Optimized**: Fully optimized for search engines using Next.js SEO practices.
 
-## Getting Started
+## 🛠️ Technology Stack
 
-First, run the development server:
+- **Framework**: Next.js 13
+- **State Management**: Redux Toolkit
+- **Styling**: Vanilla CSS & Tailwind CSS
+- **Notifications**: React Toastify
+- **Icons**: React Icons / Font Awesome
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+## ⚙️ Setup & Installation
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+2. **Environment Configuration**:
+   Create a `.env` file with the following:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
+   ```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+3. **Run the Application**:
+   ```bash
+   npm run dev
+   ```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## 📂 Project Structure
 
-## Learn More
+- `/pages`: Next.js routing and page components.
+- `/components`: Reusable UI elements (Room cards, Hero, Layouts).
+- `/store`: Redux global state management.
+- `/styles`: Global and component-specific styling.
+- `/utils`: API service helpers and formatters.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+---
+Part of the Beach Resort Hotel Management Suite.
