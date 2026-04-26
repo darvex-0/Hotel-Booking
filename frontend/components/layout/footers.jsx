@@ -5,6 +5,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { Waves } from 'lucide-react';
 
 function Footers() {
   return (
@@ -14,14 +15,20 @@ function Footers() {
         <div className='footer-grid'>
           {/* Left Column - Brand & Links */}
           <div className='footer-brand-col'>
-            <div>
-              <h2 className='footer-logo'>Beach Resort</h2>
+            <div className="footer-logo-wrap">
+              <div className='footer-logo-brand'>
+                <Waves className='footer-logo-icon' size={32} strokeWidth={1.5} />
+                <span className="footer-logo-text">
+                  <span className='logo-bold'>BEACH</span>
+                  <span className='logo-thin'>RESORT</span>
+                </span>
+              </div>
+            </div>
               <div className='footer-links'>
                 <Link href='/' className='footer-link'>Terms of Service</Link>
                 <Link href='/' className='footer-link'>Privacy Policy</Link>
                 <Link href='/' className='footer-link'>Contact Us</Link>
               </div>
-            </div>
           </div>
 
           {/* Middle Column */}

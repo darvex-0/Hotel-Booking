@@ -14,6 +14,7 @@ import {
   useScroll,
   useTransform
 } from 'framer-motion';
+import { Waves } from 'lucide-react';
 import { getSessionToken, getSessionUser } from '../../utils/authentication';
 import UserPopover from './popover';
 
@@ -71,9 +72,13 @@ function Navbar() {
           {/* Logo */}
           <div className='navbar-logo-wrap'>
             <Link href='/' className='navbar-logo'>
-              <span className={`navbar-logo-text ${scrolled ? 'scrolled' : ''}`}>
-                Beach Resort
-              </span>
+              <div className={`navbar-logo-text ${scrolled ? 'scrolled' : ''}`}>
+                <Waves className={`navbar-logo-icon ${scrolled ? 'scrolled' : ''}`} size={36} strokeWidth={1.5} />
+                <span className="logo-text-inner">
+                  <span className='logo-bold'>BEACH</span>
+                  <span className='logo-thin'>RESORT</span>
+                </span>
+              </div>
             </Link>
           </div>
 
