@@ -18,28 +18,51 @@ A premium full-stack hotel management and reservation system built with modern t
 - **Admin Panel**: React, Ant Design, Tailwind CSS
 - **Features**: JWT Auth, Winston Logging, Morgan Middleware, MySQL2
 
-## 🚀 Quick Start
+## 🚀 Fresh Setup Guide
 
-### 1. Clone & Install
+Follow these steps to get the system running on a new machine:
+
+### 1. Prerequisites
+- **Node.js**: [Download & Install Node.js](https://nodejs.org/) (LTS version recommended).
+- **MySQL Server**: Install [XAMPP](https://www.apachefriends.org/) or [MySQL Community Server](https://dev.mysql.com/downloads/mysql/).
+
+### 2. Configure the Database
+1. Open your MySQL tool (e.g., phpMyAdmin in XAMPP).
+2. Create a new database named `hotel_booking_system`.
+3. (Optional) You can import the `backend/schema.sql` if you want to set it up manually, but the setup script handles this.
+
+### 3. Setup Backend
 ```bash
-git clone https://github.com/darvex-0/Hotel-Booking.git
-cd Hotel-Booking
+cd backend
+npm install
+# Copy the example env and fill in your MySQL credentials
+cp .env.example .env
+# Run the database initialization script
+npm run db:setup
+# Start the server
+npm run dev
 ```
 
-### 2. Configure Environment
-Set up your `.env` files in `backend`, `frontend`, and `admin-panel` directories using the provided examples.
-
-### 3. Run Locally
+### 4. Setup Frontend (Guest Portal)
 ```bash
-# Start Backend
-cd backend && npm run dev
-
-# Start Frontend
-cd frontend && npm run dev
-
-# Start Admin Panel
-cd admin-panel && npm start
+cd ../frontend
+npm install
+cp .env.example .env
+npm run dev
 ```
+
+### 5. Setup Admin Panel
+```bash
+cd ../admin-panel
+npm install
+cp .env.example .env
+npm start
+```
+
+## 📝 Environment Variable Tips
+- **Backend `.env`**: Make sure `DB_USER` and `DB_PASSWORD` match your local MySQL settings.
+- **Frontend/Admin `.env`**: Ensure `API_BASE_URL` matches the URL where your backend is running (usually `http://localhost:5000/api/v1`).
+
 
 ## 🛡️ License
 
