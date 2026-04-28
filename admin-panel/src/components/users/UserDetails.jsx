@@ -1,4 +1,3 @@
-
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import {
   Button, Descriptions, Image, Modal, Result, Skeleton, Tag

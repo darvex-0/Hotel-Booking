@@ -1,4 +1,3 @@
-
 import {
   Button, Empty, Pagination, Rate, Result, Skeleton, Tag, Tooltip
 } from 'antd';

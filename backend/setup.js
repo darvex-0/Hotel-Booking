@@ -13,14 +13,14 @@ async function setupDatabase() {
 
   // 1. Connect to MySQL without database selection first
   const connection = await mysql.createConnection({
-    host: process.env.MYSQL_HOST || 'localhost',
-    user: process.env.MYSQL_USER || 'root',
-    password: process.env.MYSQL_PASSWORD || '',
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
     multipleStatements: true // Crucial for executing schema.sql
   });
 
   try {
-    const dbName = process.env.MYSQL_DATABASE || 'hotel_booking_system';
+    const dbName = process.env.DB_NAME || 'hotel_booking_system';
 
     console.log(`📂 Creating database: ${dbName}...`);
     await connection.query(`CREATE DATABASE IF NOT EXISTS ${dbName};`);

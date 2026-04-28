@@ -1,4 +1,3 @@
-
 import {
   EnvironmentOutlined, LockOutlined, MailOutlined, PhoneOutlined, UserOutlined
 } from '@ant-design/icons';

@@ -1,4 +1,3 @@
-
 import { EditOutlined } from '@ant-design/icons';
 import {
   Button, Descriptions, Image, Result, Skeleton, Tag, Tooltip, Upload

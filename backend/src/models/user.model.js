@@ -123,9 +123,14 @@ const User = {
     if (data.password) data.password = await bcrypt.hash(data.password, 8);
     if (data.userName) data.userName = data.userName.replace(/\s/g, '-');
 
-    const keys = Object.keys(data);
+    // Filter out undefined values to allow MySQL defaults to work
+    const filteredData = Object.fromEntries(
+      Object.entries(data).filter(([_, v]) => v !== undefined)
+    );
+
+    const keys = Object.keys(filteredData);
     const placeholders = keys.map(() => '?').join(', ');
-    const values = Object.values(data);
+    const values = Object.values(filteredData);
 
     const [result] = await pool.query(`INSERT INTO users (${keys.join(', ')}) VALUES (${placeholders})`, values);
     return User.findById(result.insertId);

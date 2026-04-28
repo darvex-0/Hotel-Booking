@@ -116,6 +116,7 @@ exports.register = async (req, res) => {
       ));
     }
   } catch (error) {
+    console.error('Registration Error:', error);
     // delete uploaded avatar image
     if (req?.file?.filename) {
       fs.unlink(`${appRoot}/public/uploads/users/${req.file.filename}`, (err) => {
@@ -126,7 +127,7 @@ exports.register = async (req, res) => {
     res.status(500).json(errorResponse(
       2,
       'SERVER SIDE ERROR',
-      error
+      error.message || error
     ));
   }
 };
@@ -190,7 +191,7 @@ exports.loginUser = async (req, res) => {
     // update user status & updateAt time
     const logUser = await User.findByIdAndUpdate(
       user._id,
-      { status: 'login', updatedAt: Date.now() },
+      { status: 'login', updatedAt: new Date() },
       { new: true }
     );
 
@@ -221,7 +222,7 @@ exports.logoutUser = async (req, res) => {
     // update user status & updateAt time
     await User.findByIdAndUpdate(
       user._id,
-      { status: 'logout', updatedAt: Date.now() },
+      { status: 'logout', updatedAt: new Date() },
       { new: true }
     );
 

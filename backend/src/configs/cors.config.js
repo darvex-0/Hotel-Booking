@@ -10,7 +10,8 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+    // Allow if origin is in allowedOrigins, or if it's an ngrok URL, or if there's no origin (like local requests)
+    if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.includes('ngrok-free.app')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS origin'));

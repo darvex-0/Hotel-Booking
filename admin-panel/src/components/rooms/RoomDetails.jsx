@@ -1,4 +1,3 @@
-
 import {
   Descriptions, Image, List, Result, Skeleton, Tag, Typography
 } from 'antd';

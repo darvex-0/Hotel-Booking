@@ -111,8 +111,13 @@ exports.createRoom = async (req, res) => {
       ));
     }
 
-    // check `extra_facilities[0]` filed exits
-    if (!extra_facilities[0]) {
+    // ensure extra_facilities is an array
+    const facilitiesArray = Array.isArray(extra_facilities) ?
+      extra_facilities :
+      (extra_facilities ? [extra_facilities] : []);
+
+    // check `extra_facilities` filed exists and has at least one item
+    if (facilitiesArray.length === 0) {
       for (const element of req.files) {
         fs.unlink(`${appRoot}/public/uploads/rooms/${element.filename}`, (err) => {
           if (err) { logger.error(err); }
@@ -181,7 +186,7 @@ exports.createRoom = async (req, res) => {
       provide_breakfast: String(provide_breakfast) === 'true',
       featured_room: String(featured_room) === 'true',
       room_description,
-      extra_facilities,
+      extra_facilities: facilitiesArray,
       room_images: req?.files?.map((file) => ({ url: `/uploads/rooms/${file.filename}` })),
       created_by: req.user.id
     };
@@ -444,8 +449,13 @@ exports.editRoomByAdmin = async (req, res) => {
       ));
     }
 
-    // check `extra_facilities[0]` filed exits
-    if (!extra_facilities[0]) {
+    // ensure extra_facilities is an array
+    const facilitiesArray = Array.isArray(extra_facilities) ?
+      extra_facilities :
+      (extra_facilities ? [extra_facilities] : []);
+
+    // check `extra_facilities` filed exits
+    if (facilitiesArray.length === 0) {
       for (const element of req.files) {
         fs.unlink(`${appRoot}/public/uploads/rooms/${element.filename}`, (err) => {
           if (err) { logger.error(err); }
@@ -487,7 +497,7 @@ exports.editRoomByAdmin = async (req, res) => {
       provide_breakfast: String(provide_breakfast) === 'true',
       featured_room: String(featured_room) === 'true',
       room_description,
-      extra_facilities,
+      extra_facilities: facilitiesArray,
       updatedAt: Date.now()
     };
 

@@ -1,4 +1,3 @@
-
 import { SmileOutlined } from '@ant-design/icons';
 import { Button, Result } from 'antd';
 import React from 'react';

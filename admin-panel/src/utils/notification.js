@@ -1,4 +1,3 @@
-
 import { notification } from 'antd';
 
 const notificationWithIcon = (type, title, msg) => {

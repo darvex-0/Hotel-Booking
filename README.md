@@ -13,6 +13,8 @@ A premium full-stack hotel management and reservation system built with modern t
 
 ## 🛠️ Technology Stack
 
+![Tech Stack](./tech-stack.png)
+
 - **Backend**: Node.js, Express.js, MySQL
 - **Frontend**: Next.js 13, React, Redux Toolkit
 - **Admin Panel**: React, Ant Design, Tailwind CSS

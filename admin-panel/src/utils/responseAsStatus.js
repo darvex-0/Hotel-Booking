@@ -1,4 +1,3 @@
-
 export const userStatusAsResponse = (status) => {
   if (status === 'register') {
     return {
