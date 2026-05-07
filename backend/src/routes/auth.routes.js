@@ -19,7 +19,7 @@ router.route('/auth/change-password').post(isAuthenticatedUser, isBlocked, chang
 
 // routes for user email verification
 router.route('/auth/send-email-verification-link').post(isAuthenticatedUser, isBlocked, sendEmailVerificationLink);
-router.route('/auth/verify-email/:token').post(isAuthenticatedUser, isBlocked, emailVerification);
+router.route('/auth/verify-email/:token').get(emailVerification);
 
 // route for get user refresh JWT Token
 router.route('/auth/refresh-token').get(isRefreshTokenValid, refreshToken);

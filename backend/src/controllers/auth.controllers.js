@@ -419,7 +419,7 @@ exports.sendEmailVerificationLink = async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     // mailing data
-    const url = `${process.env.APP_SERVICE_URL}/auth/verify-email/${verificationToken}`;
+    const url = `${process.env.APP_SERVICE_URL}/api/v1/auth/verify-email/${verificationToken}`;
     const subjects = 'User Email Verification';
     const message = 'Click below link to verify your email. If you have not requested this email simply ignore this email.';
     const title = 'Verify Your Email';
@@ -464,11 +464,17 @@ exports.emailVerification = async (req, res) => {
       user.verified = true;
       await user.save();
 
-      res.status(200).json(successResponse(
-        0,
-        'SUCCESS',
-        'User email verification successful'
-      ));
+      res.status(200).send(`
+        <html>
+          <body style="font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5;">
+            <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center;">
+              <h1 style="color: #28a745; margin-bottom: 16px;">✅ Email Verified!</h1>
+              <p style="color: #555; margin-bottom: 24px;">Your email has been successfully verified. You can now log in to your account.</p>
+              <a href="http://localhost:3034/login" style="background: #1a1a2e; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">Go to Login</a>
+            </div>
+          </body>
+        </html>
+      `);
     } else {
       return res.status(400).json(errorResponse(
         1,

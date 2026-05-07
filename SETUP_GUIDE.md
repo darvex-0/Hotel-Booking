@@ -140,8 +140,8 @@ The admin panel allows staff to manage rooms, bookings, and users.
 Once the database is set up, you can log in with these default accounts:
 
 ### Admin Panel
-- **Email**: `admin@gmail.com`
-- **Password**: `password`
+- **Email**: `admin@example.com`
+- **Password**: `admin123`
 
 ### Frontend (Guest)
 - **Email**: `user@gmail.com`

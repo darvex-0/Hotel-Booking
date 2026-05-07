@@ -34,6 +34,29 @@ async function setupDatabase() {
     await connection.query(schemaSql);
     console.log('✅ Tables created successfully!');
 
+    // 4. Migration: Ensure UPI columns exist (in case schema.sql was old or modified)
+    console.log('🛠️ Checking for UPI payment columns...');
+    try {
+      await connection.query(`
+        ALTER TABLE bookings 
+        ADD COLUMN IF NOT EXISTS upi_id VARCHAR(100) AFTER user_id,
+        ADD COLUMN IF NOT EXISTS transaction_id VARCHAR(100) AFTER upi_id;
+      `);
+      console.log('✅ UPI payment columns verified!');
+    } catch (err) {
+      // Fallback for older MySQL versions that don't support ADD COLUMN IF NOT EXISTS
+      try {
+        await connection.query('ALTER TABLE bookings ADD COLUMN upi_id VARCHAR(100) AFTER user_id, ADD COLUMN transaction_id VARCHAR(100) AFTER upi_id;');
+        console.log('✅ UPI payment columns added!');
+      } catch (innerErr) {
+        if (innerErr.code === 'ER_DUP_FIELDNAME') {
+          console.log('ℹ️ UPI payment columns already exist.');
+        } else {
+          console.warn('⚠️ Warning during migration:', innerErr.message);
+        }
+      }
+    }
+
     // Optional: Seed an initial admin user if the table is empty
     const [users] = await connection.query('SELECT id FROM users LIMIT 1');
     if (users.length === 0) {

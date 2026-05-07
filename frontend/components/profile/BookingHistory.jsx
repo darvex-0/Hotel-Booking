@@ -127,6 +127,21 @@ function BookingHistory() {
               align: 'center'
             },
             {
+              key: 'upi',
+              title: 'Payment Info',
+              render: (_, record) => (
+                <div style={{ fontSize: 12, lineHeight: '1.6' }}>
+                  {record?.upi_id ? (
+                    <>
+                      <div><strong>UPI:</strong> {record.upi_id}</div>
+                      <div><strong>TXN:</strong> {record.transaction_id}</div>
+                    </>
+                  ) : 'N/A'}
+                </div>
+              ),
+              align: 'center'
+            },
+            {
               key: 4,
               title: 'Review & Ratting',
               dataIndex: 'reviews',

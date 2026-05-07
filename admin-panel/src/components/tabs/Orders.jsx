@@ -66,6 +66,12 @@ function Orders() {
                           Booked Room
                         </th>
                         <th className='data-table-head-tr-th text-center' scope='col'>
+                          UPI ID
+                        </th>
+                        <th className='data-table-head-tr-th text-center' scope='col'>
+                          Transaction ID
+                        </th>
+                        <th className='data-table-head-tr-th text-center' scope='col'>
                           Review & Ratting
                         </th>
                         <th className='data-table-head-tr-th text-center' scope='col'>
@@ -96,6 +102,16 @@ function Orders() {
                           </td>
                           <td className='data-table-body-tr-td'>
                             {data?.room?.room_name}
+                          </td>
+                          <td className='data-table-body-tr-td text-center'>
+                            <span className='text-xs font-mono'>
+                              {data?.upi_id || 'N/A'}
+                            </span>
+                          </td>
+                          <td className='data-table-body-tr-td text-center'>
+                            <span className='text-xs font-mono'>
+                              {data?.transaction_id || 'N/A'}
+                            </span>
                           </td>
                           <Tooltip
                             title={data?.reviews?.message}

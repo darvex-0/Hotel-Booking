@@ -1,6 +1,6 @@
 
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Modal, message } from 'antd';
+import { Button, Divider, Input, Modal, Steps, message } from 'antd';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
@@ -12,10 +12,12 @@ import Toolbar from 'react-multi-date-picker/plugins/toolbar';
 import ApiService from '../../utils/apiService';
 import notificationWithIcon from '../../utils/notification';
 
-// const { confirm } = Modal;
-
 function OrderPlaceModal({ bookingModal, setBookingModal }) {
   const [selectedDates, setSelectedDates] = useState([]);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [upiId, setUpiId] = useState('');
+  const [transactionId, setTransactionId] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   // handle date change on date picker
@@ -24,109 +26,235 @@ function OrderPlaceModal({ bookingModal, setBookingModal }) {
     setSelectedDates(formattedDates);
   };
 
-  // function to handle placed room booking order
-  const handlePlacedOrder = () => {
+  // go to next step (date → payment)
+  const handleNext = () => {
     if (selectedDates.length === 0) {
-      notificationWithIcon('error', 'ERROR', 'Minimum 1 date selection is required to placed an room booking order.');
+      notificationWithIcon('error', 'ERROR', 'Minimum 1 date selection is required to place a room booking order.');
     } else if (selectedDates.length > 5) {
-      notificationWithIcon('error', 'ERROR', 'Maximum 5 days selection possible to placed an room booking order.');
+      notificationWithIcon('error', 'ERROR', 'Maximum 5 days selection possible to place a room booking order.');
     } else {
-      Modal.confirm({
-        title: 'Are your selected dates booked this Room?',
-        icon: <ExclamationCircleOutlined />,
-        okText: 'Ok',
-        cancelText: 'Cancel',
-        onOk() {
-          return new Promise((resolve, reject) => {
-            ApiService.post(`/api/v1/placed-booking-order/${bookingModal?.roomId}`, {
-              booking_dates: selectedDates
-            })
-              .then((res) => {
-                resolve();
-                if (res?.result_code === 0) {
-                  notificationWithIcon('success', 'SUCCESS', (res?.result?.message || 'Your room booking order placed successful'));
-                  setBookingModal((prevState) => ({ ...prevState, open: false, roomId: null }));
-                  router.push('/profile?tab=booking-history');
-                  setSelectedDates([]);
-                } else {
-                  notificationWithIcon('error', 'ERROR', 'Sorry! Something went wrong. App server error');
-                }
-              })
-              .catch((err) => {
-                notificationWithIcon('error', 'ERROR', (err?.response?.data?.result?.error?.message || err?.message || 'Sorry! Something went wrong. App server error'));
-                reject();
-              });
-          }).catch((err) => message.error(err?.message || 'Oops errors!'));
-        }
-      });
+      setCurrentStep(1);
     }
+  };
+
+  // go back to date step
+  const handleBack = () => {
+    setCurrentStep(0);
+  };
+
+  // function to handle placed room booking order with UPI payment
+  const handlePlacedOrder = () => {
+    if (!upiId.trim()) {
+      notificationWithIcon('error', 'ERROR', 'Please enter your UPI ID.');
+      return;
+    }
+    if (!transactionId.trim()) {
+      notificationWithIcon('error', 'ERROR', 'Please enter your Transaction ID.');
+      return;
+    }
+
+    Modal.confirm({
+      title: 'Confirm your booking with UPI payment?',
+      icon: <ExclamationCircleOutlined />,
+      content: (
+        <div style={{ marginTop: 10 }}>
+          <p><strong>Dates:</strong> {selectedDates.join(', ')}</p>
+          <p><strong>UPI ID:</strong> {upiId}</p>
+          <p><strong>Transaction ID:</strong> {transactionId}</p>
+        </div>
+      ),
+      okText: 'Confirm Booking',
+      cancelText: 'Cancel',
+      onOk() {
+        return new Promise((resolve, reject) => {
+          setLoading(true);
+          ApiService.post(`/api/v1/placed-booking-order/${bookingModal?.roomId}`, {
+            booking_dates: selectedDates,
+            upi_id: upiId.trim(),
+            transaction_id: transactionId.trim()
+          })
+            .then((res) => {
+              setLoading(false);
+              resolve();
+              if (res?.result_code === 0) {
+                notificationWithIcon('success', 'SUCCESS', (res?.result?.message || 'Your room booking order placed successful. Payment verification is pending.'));
+                setBookingModal((prevState) => ({ ...prevState, open: false, roomId: null }));
+                router.push('/profile?tab=booking-history');
+                setSelectedDates([]);
+                setUpiId('');
+                setTransactionId('');
+                setCurrentStep(0);
+              } else {
+                notificationWithIcon('error', 'ERROR', 'Sorry! Something went wrong. App server error');
+              }
+            })
+            .catch((err) => {
+              setLoading(false);
+              notificationWithIcon('error', 'ERROR', (err?.response?.data?.result?.error?.message || err?.message || 'Sorry! Something went wrong. App server error'));
+              reject();
+            });
+        }).catch((err) => message.error(err?.message || 'Oops errors!'));
+      }
+    });
+  };
+
+  // close modal and reset
+  const handleClose = () => {
+    setBookingModal((prevState) => (
+      { ...prevState, open: false, roomId: null }
+    ));
+    setCurrentStep(0);
+    setSelectedDates([]);
+    setUpiId('');
+    setTransactionId('');
   };
 
   return (
     <Modal
-      title='Select data which dates are you Booked Room:'
+      title='Book Room'
       open={bookingModal.open}
-      onOk={() => setBookingModal((prevState) => (
-        { ...prevState, open: false, roomId: null }
-      ))}
-      onCancel={() => setBookingModal((prevState) => (
-        { ...prevState, open: false, roomId: null }
-      ))}
-      closable={false}
+      onCancel={handleClose}
+      closable
       centered
-      footer={[
-        <div key='custom-footer'>
-          {/* button closed/hide modal */}
-          <Button
-            onClick={() => setBookingModal((prevState) => (
-              { ...prevState, open: false, roomId: null }
-            ))}
-            type='default'
-            size='middle'
-          >
-            Cancel
-          </Button>
-
-          {/* button to handle placed order */}
-          <Button
-            onClick={handlePlacedOrder}
-            type='primary'
-            size='middle'
-          >
-            Placed Order
-          </Button>
-        </div>
-      ]}
+      width={580}
+      footer={null}
     >
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Calendar
-          style={{ width: '100%' }}
-          plugins={[
-            <DatePickerHeader
-              key='date-picker-header'
-              position='top'
-              size='medium'
-            />,
-            <DatePanel
+      {/* Steps indicator */}
+      <Steps
+        current={currentStep}
+        size='small'
+        style={{ marginBottom: 24 }}
+        items={[
+          { title: 'Select Dates' },
+          { title: 'UPI Payment' }
+        ]}
+      />
+
+      {/* Step 1: Date Selection */}
+      {currentStep === 0 && (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Calendar
               style={{ width: '100%' }}
-              key='date-panel'
-              position='right'
-              sort='date'
-            />,
-            <Toolbar
-              key='toolbar'
-              position='bottom'
+              plugins={[
+                <DatePickerHeader
+                  key='date-picker-header'
+                  position='top'
+                  size='medium'
+                />,
+                <DatePanel
+                  style={{ width: '100%' }}
+                  key='date-panel'
+                  position='right'
+                  sort='date'
+                />,
+                <Toolbar
+                  key='toolbar'
+                  position='bottom'
+                />
+              ]}
+              minDate={new Date(new Date()).setDate(new Date().getDate() + 1)}
+              maxDate={new Date(new Date()).setDate(new Date().getDate() + 30)}
+              onChange={handleDateChange}
+              value={selectedDates}
+              format='YYYY/MM/DD'
+              highlightToday
+              multiple
             />
-          ]}
-          minDate={new Date(new Date()).setDate(new Date().getDate() + 1)}
-          maxDate={new Date(new Date()).setDate(new Date().getDate() + 30)}
-          onChange={handleDateChange}
-          value={selectedDates}
-          format='YYYY/MM/DD'
-          highlightToday
-          multiple
-        />
-      </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
+            <Button onClick={handleClose} type='default' size='middle'>
+              Cancel
+            </Button>
+            <Button onClick={handleNext} type='primary' size='middle'>
+              Next →
+            </Button>
+          </div>
+        </>
+      )}
+
+      {/* Step 2: UPI Payment */}
+      {currentStep === 1 && (
+        <>
+          {/* UPI Payment Info Card */}
+          <div style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: 12,
+            padding: '20px 24px',
+            color: '#fff',
+            marginBottom: 20,
+            textAlign: 'center'
+          }}>
+            <p style={{ margin: 0, fontSize: 13, opacity: 0.85 }}>Pay to this UPI ID</p>
+            <h2 style={{
+              margin: '8px 0 4px',
+              fontSize: 22,
+              fontWeight: 700,
+              letterSpacing: 0.5,
+              color: '#fff'
+            }}>
+              beachresort@upi
+            </h2>
+            <p style={{ margin: 0, fontSize: 12, opacity: 0.7 }}>Beach Resort Pvt. Ltd.</p>
+          </div>
+
+          <Divider style={{ margin: '16px 0' }}>Enter Your Payment Details</Divider>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, fontSize: 14 }}>
+                Your UPI ID
+              </label>
+              <Input
+                placeholder='e.g. yourname@paytm'
+                value={upiId}
+                onChange={(e) => setUpiId(e.target.value)}
+                size='large'
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, fontSize: 14 }}>
+                Transaction ID / UTR Number
+              </label>
+              <Input
+                placeholder='e.g. TXN123456789'
+                value={transactionId}
+                onChange={(e) => setTransactionId(e.target.value)}
+                size='large'
+              />
+            </div>
+          </div>
+
+          {/* Selected dates summary */}
+          <div style={{
+            background: '#f6f8fa',
+            borderRadius: 8,
+            padding: '12px 16px',
+            marginTop: 16,
+            fontSize: 13,
+            color: '#555'
+          }}>
+            <strong>Selected Dates:</strong> {selectedDates.join(', ')}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
+            <Button onClick={handleBack} type='default' size='middle'>
+              ← Back
+            </Button>
+            <Button
+              onClick={handlePlacedOrder}
+              type='primary'
+              size='middle'
+              loading={loading}
+              disabled={loading}
+            >
+              Submit Booking
+            </Button>
+          </div>
+        </>
+      )}
     </Modal>
   );
 }

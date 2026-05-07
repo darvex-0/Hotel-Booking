@@ -4,6 +4,7 @@ const Booking = require('../models/booking.model');
 const { errorResponse, successResponse } = require('../configs/app.response');
 const MyQueryHelper = require('../configs/api.feature');
 const { bookingDatesBeforeCurrentDate } = require('../lib/booking.dates.validator');
+const sendBookingStatusEmail = require('../configs/send.booking.mail');
 
 // TODO: controller for placed booking order
 exports.placedBookingOrder = async (req, res) => {
@@ -48,11 +49,22 @@ exports.placedBookingOrder = async (req, res) => {
       ));
     }
 
+    // validate UPI payment details
+    if (!req.body.upi_id || !req.body.transaction_id) {
+      return res.status(400).json(errorResponse(
+        1,
+        'FAILED',
+        'Please provide your UPI ID and Transaction ID for payment verification'
+      ));
+    }
+
     // prepared user provided data to store database
     const data = {
       room_id: req.params.id,
       booking_dates: req.body.booking_dates,
-      booking_by: req.user.id
+      booking_by: req.user.id,
+      upi_id: req.body.upi_id,
+      transaction_id: req.body.transaction_id
     };
 
     // save room data in database
@@ -109,6 +121,8 @@ exports.getBookingOrderByUserId = async (req, res) => {
       id: data?.id,
       booking_dates: data?.booking_dates,
       booking_status: data?.booking_status,
+      upi_id: data?.upi_id || null,
+      transaction_id: data?.transaction_id || null,
       reviews: !data?.reviews ? null : {
         id: data?.reviews.id,
         room_id: data?.reviews.room_id,
@@ -284,6 +298,8 @@ exports.getBookingOrderForAdmin = async (req, res) => {
       id: data?.id,
       booking_dates: data?.booking_dates,
       booking_status: data?.booking_status,
+      upi_id: data?.upi_id || null,
+      transaction_id: data?.transaction_id || null,
       reviews: !data?.reviews ? null : {
         id: data?.reviews.id,
         room_id: data?.reviews.room_id,
@@ -438,6 +454,12 @@ exports.updatedBookingOrderByAdmin = async (req, res) => {
             // update the room status to 'booked'
             myRoom.room_status = 'booked';
             await myRoom.save({ validateBeforeSave: false });
+
+            // send approval email to user
+            const bookingUser = await require('../models/user.model').findById(booking.user_id || booking.booking_by);
+            if (bookingUser?.email) {
+              sendBookingStatusEmail(bookingUser, 'approved', myRoom, booking.booking_dates);
+            }
           } else {
             return res.status(400).json(errorResponse(
               1,
@@ -458,6 +480,12 @@ exports.updatedBookingOrderByAdmin = async (req, res) => {
           // update the booking status to `rejected`
           booking.booking_status = 'rejected';
           await booking.save({ validateBeforeSave: false });
+
+          // send rejection email to user
+          const rejectedUser = await require('../models/user.model').findById(booking.user_id || booking.booking_by);
+          if (rejectedUser?.email) {
+            sendBookingStatusEmail(rejectedUser, 'rejected', myRoom, booking.booking_dates);
+          }
         } else {
           return res.status(400).json(errorResponse(
             1,

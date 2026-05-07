@@ -89,6 +89,8 @@ CREATE TABLE bookings (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     room_id         INT NOT NULL,
     user_id         INT NOT NULL,
+    upi_id          VARCHAR(100),
+    transaction_id  VARCHAR(100),
     booking_status  ENUM('pending', 'cancel', 'approved', 'rejected', 'in-reviews', 'completed') DEFAULT 'pending',
     createdAt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
