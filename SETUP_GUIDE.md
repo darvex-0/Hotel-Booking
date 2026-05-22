@@ -96,7 +96,7 @@ The frontend is the website where guests can view rooms and make bookings.
         ```
     *   Ensure `API_BASE_URL` points to your backend:
         ```env
-        API_BASE_URL=http://localhost:5000/api/v1
+        API_BASE_URL=http://localhost:5000
         ```
 4.  **Start the Frontend**:
     ```bash
@@ -125,7 +125,7 @@ The admin panel allows staff to manage rooms, bookings, and users.
         ```
     *   Ensure the API URL is correct:
         ```env
-        REACT_APP_API_BASE_URL=http://localhost:5000/api/v1
+        REACT_APP_API_BASE_URL=http://localhost:5000
         ```
 4.  **Start the Admin Panel**:
     ```bash
