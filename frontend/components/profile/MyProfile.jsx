@@ -3,7 +3,6 @@ import { EditOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 import {
   Button, Descriptions, Image, Modal, Result, Skeleton, Tag, Tooltip, Upload
 } from 'antd';
-import ImgCrop from 'antd-img-crop';
 import getConfig from 'next/config';
 import React, { useState } from 'react';
 import useFetchData from '../../hooks/useFetchData';
@@ -126,17 +125,15 @@ function MyProfile() {
 
               {/* user avatar change */}
               <div style={{ position: 'absolute', marginTop: '-7rem', marginLeft: '5.5rem' }}>
-                <ImgCrop showGrid rotationSlider>
-                  <Upload {...props}>
-                    <Tooltip title='Click to change Avatar'>
-                      <Button
-                        icon={<EditOutlined />}
-                        type='default'
-                        shape='circle'
-                      />
-                    </Tooltip>
-                  </Upload>
-                </ImgCrop>
+                <Upload {...props}>
+                  <Tooltip title='Click to change Avatar'>
+                    <Button
+                      icon={<EditOutlined />}
+                      type='default'
+                      shape='circle'
+                    />
+                  </Tooltip>
+                </Upload>
               </div>
             </Descriptions.Item>
 

@@ -224,7 +224,7 @@ function Main() {
         </Content>
 
         <Footer className='text-center font-text-font font-medium '>
-          ©2023 Beach Resort
+          ©2026 Beach Resort
         </Footer>
       </Layout>
     </Layout>
