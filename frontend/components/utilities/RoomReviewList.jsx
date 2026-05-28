@@ -8,7 +8,7 @@ import useFetchData from '../../hooks/useFetchData';
 import { getSessionUser } from '../../utils/authentication';
 import ReviewEditModal from './ReviewEditModal';
 
-function RoomReviewList({ roomId }) {
+function RoomReviewList({ roomId, fetchAgain: fetchAgainProp }) {
   const user = getSessionUser();
   const [fetchAgain, setFetchAgain] = useState(false);
   const [filter, setFilter] = useState({
@@ -19,7 +19,7 @@ function RoomReviewList({ roomId }) {
   });
 
   // fetch user booking history API data
-  const [loading, error, response] = useFetchData(`/api/v1/get-room-reviews-list/${roomId}?limit=${filter.limit}&page=${filter.page}&sort=${filter.sort}`, fetchAgain);
+  const [loading, error, response] = useFetchData(`/api/v1/get-room-reviews-list/${roomId}?limit=${filter.limit}&page=${filter.page}&sort=${filter.sort}`, fetchAgainProp !== undefined ? fetchAgainProp : fetchAgain);
 
   return (
     <>
@@ -122,11 +122,13 @@ function RoomReviewList({ roomId }) {
 }
 
 RoomReviewList.defaultProps = {
-  roomId: ''
+  roomId: '',
+  fetchAgain: undefined
 };
 
 RoomReviewList.propTypes = {
-  roomId: PropTypes.string
+  roomId: PropTypes.string,
+  fetchAgain: PropTypes.oneOfType([PropTypes.bool, PropTypes.object])
 };
 
 export default RoomReviewList;

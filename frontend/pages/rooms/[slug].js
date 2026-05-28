@@ -12,6 +12,8 @@ import StyledHero from '../../components/rooms/StyledHero';
 import Loading from '../../components/shared/Loading';
 import OrderPlaceModal from '../../components/utilities/OrderPlaceModal';
 import RoomReviewList from '../../components/utilities/RoomReviewList';
+import ReviewAddModal from '../../components/utilities/ReviewAddModal';
+import useFetchData from '../../hooks/useFetchData';
 import { getSessionToken, getSessionUser } from '../../utils/authentication';
 import notificationWithIcon from '../../utils/notification';
 
@@ -19,9 +21,22 @@ const { publicRuntimeConfig } = getConfig();
 
 function RoomPreview(props) {
   const [bookingModal, setBookingModal] = useState({ open: false, roomId: null });
+  const [addReviewModal, setAddReviewModal] = useState({ open: false, bookingId: null });
+  const [fetchAgain, setFetchAgain] = useState(false);
   const token = getSessionToken();
   const user = getSessionUser();
   const router = useRouter();
+
+  // Fetch user bookings to check if they have an active `in-reviews` booking for this room
+  const [bookingsLoading, bookingsError, bookingsResponse] = useFetchData(
+    user && token ? `/api/v1/get-user-booking-orders?limit=100` : null,
+    fetchAgain
+  );
+
+  // Find if there is an 'in-reviews' booking for the current room
+  const pendingReviewBooking = bookingsResponse?.rows?.find(
+    (b) => b?.room?.id === props?.room?.data?.id && b?.booking_status === 'in-reviews'
+  );
 
   // function to handle place booking order
   const handleOrder = () => {
@@ -92,32 +107,49 @@ function RoomPreview(props) {
                   <h6>{props?.room?.data?.allow_pets ? 'pets allowed' : 'no pets allowed'}</h6>
                   <h6>{props?.room?.data?.provide_breakfast && 'free breakfast included'}</h6>
 
-                  {props?.room?.data?.room_status === 'available' ? (
-                    <Button
-                      className='btn-primary'
-                      type='default'
-                      size='large'
-                      onClick={handleOrder}
-                    >
-                      Place Room Booking Order
-                    </Button>
-                  ) : (
-                    <Button
-                      className='btn-primary'
-                      type='default'
-                      size='large'
-                      disabled
-                    >
-                      Room Unavailable! Can&#39;t Place Order
-                    </Button>
-                  )}
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '20px' }}>
+                    {props?.room?.data?.room_status === 'available' ? (
+                      <Button
+                        className='btn-primary'
+                        type='default'
+                        size='large'
+                        onClick={handleOrder}
+                      >
+                        Place Room Booking Order
+                      </Button>
+                    ) : (
+                      <Button
+                        className='btn-primary'
+                        type='default'
+                        size='large'
+                        disabled
+                      >
+                        Room Unavailable! Can&#39;t Place Order
+                      </Button>
+                    )}
+
+                    {pendingReviewBooking && (
+                      <Button
+                        className='btn-primary'
+                        style={{ backgroundColor: '#722ed1', borderColor: '#722ed1', color: '#fff' }}
+                        type='primary'
+                        size='large'
+                        onClick={() => setAddReviewModal({
+                          open: true,
+                          bookingId: pendingReviewBooking.id
+                        })}
+                      >
+                        Write a Review
+                      </Button>
+                    )}
+                  </div>
                 </article>
               </div>
 
               {/* room reviews list */}
               <div className='single-room-images'>
                 {props?.room?.data?.id && (
-                  <RoomReviewList roomId={props?.room?.data?.id} />
+                  <RoomReviewList roomId={props?.room?.data?.id} fetchAgain={fetchAgain} />
                 )}
               </div>
             </section>
@@ -130,6 +162,15 @@ function RoomPreview(props) {
         <OrderPlaceModal
           bookingModal={bookingModal}
           setBookingModal={setBookingModal}
+        />
+      )}
+
+      {/* to review add modal component */}
+      {addReviewModal?.open && (
+        <ReviewAddModal
+          addReviewModal={addReviewModal}
+          setAddReviewModal={setAddReviewModal}
+          setFetchAgain={setFetchAgain}
         />
       )}
     </>

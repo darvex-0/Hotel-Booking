@@ -6,6 +6,17 @@ export default function RoomFilter({ ourRooms, setOurFilteredRooms }) {
   const [allowBreakfast, setAllowBreakfast] = useState(false);
   const [allowPets, setAllowPets] = useState(false);
 
+  const prices = ourRooms.map((room) => Number(room.room_price));
+  const maxPrice = prices.length ? Math.max(...prices) : 1000;
+  const minPrice = prices.length ? Math.min(...prices) : 0;
+  const [selectedPrice, setSelectedPrice] = useState(1000);
+
+  useEffect(() => {
+    if (prices.length) {
+      setSelectedPrice(maxPrice);
+    }
+  }, [ourRooms]);
+
   // function to handle `room_type` filed filtering
   const roomTypeFiltering = (value) => {
     if (value === 'all') {
@@ -18,7 +29,8 @@ export default function RoomFilter({ ourRooms, setOurFilteredRooms }) {
 
   // function to handle `room_price` filed filtering
   const roomPriceFiltering = (value) => {
-    const filteredRooms = ourRooms.filter((room) => room.room_price <= parseInt(value, 10));
+    setSelectedPrice(value);
+    const filteredRooms = ourRooms.filter((room) => Number(room.room_price) <= parseInt(value, 10));
     setOurFilteredRooms(filteredRooms);
   };
 
@@ -68,15 +80,15 @@ export default function RoomFilter({ ourRooms, setOurFilteredRooms }) {
 
         {/* room price start */}
         <div className='form-group'>
-          <label htmlFor='price'>started price $ 100</label>
+          <label htmlFor='price'>{`room price: $${selectedPrice}`}</label>
           <input
             className='form-control'
             type='range'
             name='price'
             id='price'
-            min={100}
-            max={1000}
-            defaultValue={1000}
+            min={minPrice}
+            max={maxPrice}
+            value={selectedPrice}
             onChange={(e) => roomPriceFiltering(e.target.value)}
           />
         </div>
