@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Title from '../home/Title';
 
 export default function RoomFilter({ ourRooms, setOurFilteredRooms }) {
+  const [selectedType, setSelectedType] = useState('all');
   const [allowBreakfast, setAllowBreakfast] = useState(false);
   const [allowPets, setAllowPets] = useState(false);
 
@@ -11,48 +12,37 @@ export default function RoomFilter({ ourRooms, setOurFilteredRooms }) {
   const minPrice = prices.length ? Math.min(...prices) : 0;
   const [selectedPrice, setSelectedPrice] = useState(1000);
 
+  // set selected price to max price when ourRooms loaded
   useEffect(() => {
     if (prices.length) {
       setSelectedPrice(maxPrice);
     }
   }, [ourRooms]);
 
-  // function to handle `room_type` filed filtering
-  const roomTypeFiltering = (value) => {
-    if (value === 'all') {
-      setOurFilteredRooms(ourRooms);
-    } else {
-      const filteredRooms = ourRooms.filter((room) => room.room_type === value);
-      setOurFilteredRooms(filteredRooms);
-    }
-  };
-
-  // function to handle `room_price` filed filtering
-  const roomPriceFiltering = (value) => {
-    setSelectedPrice(value);
-    const filteredRooms = ourRooms.filter((room) => Number(room.room_price) <= parseInt(value, 10));
-    setOurFilteredRooms(filteredRooms);
-  };
-
-  // function to handle `provide_breakfast` filed filtering
+  // unified filter effect
   useEffect(() => {
+    let filtered = [...ourRooms];
+
+    // Filter by type
+    if (selectedType !== 'all') {
+      filtered = filtered.filter((room) => room.room_type === selectedType);
+    }
+
+    // Filter by price
+    filtered = filtered.filter((room) => Number(room.room_price) <= selectedPrice);
+
+    // Filter by breakfast
     if (allowBreakfast) {
-      const filteredRooms = ourRooms.filter((room) => room.provide_breakfast === allowBreakfast);
-      setOurFilteredRooms(filteredRooms);
-    } else {
-      setOurFilteredRooms(ourRooms);
+      filtered = filtered.filter((room) => !!room.provide_breakfast);
     }
-  }, [allowBreakfast]);
 
-  // function to handle `allow_pets` filed filtering
-  useEffect(() => {
+    // Filter by pets
     if (allowPets) {
-      const filteredRooms = ourRooms.filter((room) => room.allow_pets === allowPets);
-      setOurFilteredRooms(filteredRooms);
-    } else {
-      setOurFilteredRooms(ourRooms);
+      filtered = filtered.filter((room) => !!room.allow_pets);
     }
-  }, [allowPets]);
+
+    setOurFilteredRooms(filtered);
+  }, [selectedType, selectedPrice, allowBreakfast, allowPets, ourRooms]);
 
   return (
     <section className='filter-container'>
@@ -64,8 +54,8 @@ export default function RoomFilter({ ourRooms, setOurFilteredRooms }) {
           <label htmlFor='type'>rooms type</label>
           <select
             className='form-control'
-            onChange={(e) => roomTypeFiltering(e.target.value)}
-            defaultValue='all'
+            onChange={(e) => setSelectedType(e.target.value)}
+            value={selectedType}
             name='type'
             id='type'
           >
@@ -89,7 +79,7 @@ export default function RoomFilter({ ourRooms, setOurFilteredRooms }) {
             min={minPrice}
             max={maxPrice}
             value={selectedPrice}
-            onChange={(e) => roomPriceFiltering(e.target.value)}
+            onChange={(e) => setSelectedPrice(Number(e.target.value))}
           />
         </div>
         {/* room price end */}

@@ -10,6 +10,7 @@ class UserInstance {
     Object.assign(this, data);
     this._id = data.id; // Compatibility
     this.id = data.id;
+    this.verified = data.verified !== undefined ? !!data.verified : false;
   }
 
   getJWTToken() {

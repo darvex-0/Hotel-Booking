@@ -6,6 +6,9 @@ class RoomInstance {
     if (!data) return;
     Object.assign(this, data);
     this._id = data.id;
+    this.allow_pets = data.allow_pets !== undefined ? !!data.allow_pets : false;
+    this.provide_breakfast = data.provide_breakfast !== undefined ? !!data.provide_breakfast : false;
+    this.featured_room = data.featured_room !== undefined ? !!data.featured_room : false;
     this.room_images = data.room_images || [];
     this.extra_facilities = data.extra_facilities || [];
   }

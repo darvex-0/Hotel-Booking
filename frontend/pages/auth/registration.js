@@ -127,16 +127,28 @@ function Registration() {
 
             <Form.Item
               name='dob'
-              rules={[{
-                required: true,
-                message: 'Please input your Date Of Birth!'
-              }]}
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input your Date Of Birth!'
+                },
+                {
+                  validator: (_, value) => {
+                    if (value && value.isAfter(dayjs().endOf('day'))) {
+                      return Promise.reject(new Error('Date of Birth cannot be in the future!'));
+                    }
+                    return Promise.resolve();
+                  }
+                }
+              ]}
             >
               <DatePicker
                 style={{ width: '100%' }}
                 placeholder='Pick your Date Of Birth'
                 size='large'
                 allowClear
+                inputReadOnly
+                disabledDate={(current) => current && current.isAfter(dayjs().endOf('day'))}
               />
             </Form.Item>
 
@@ -195,7 +207,7 @@ function Registration() {
                 loading={loading}
                 disabled={loading}
               >
-                Registration
+                Register
               </Button>
             </Form.Item>
 

@@ -41,7 +41,7 @@ function RoomPreview(props) {
   // function to handle place booking order
   const handleOrder = () => {
     if (!token && !user) {
-      notificationWithIcon('error', 'ERROR', 'Please Registration/Login first to place an order.');
+      notificationWithIcon('error', 'ERROR', 'Please Register/Login first to place an order.');
       router.push('/auth/login');
     } else {
       setBookingModal((prevState) => (

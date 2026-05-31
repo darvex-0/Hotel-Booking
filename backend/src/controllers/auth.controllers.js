@@ -16,6 +16,22 @@ exports.register = async (req, res) => {
     } = req.body;
 
     if (userName && fullName && email && password && dob && address) {
+      // check if date of birth is in the future
+      if (new Date(dob) > new Date()) {
+        // delete uploaded avatar image
+        if (req?.file?.filename) {
+          fs.unlink(`${appRoot}/public/uploads/users/${req.file.filename}`, (err) => {
+            if (err) { logger.error(err); }
+          });
+        }
+
+        return res.status(400).json(errorResponse(
+          1,
+          'FAILED',
+          'Date of Birth cannot be in the future'
+        ));
+      }
+
       // check if userName, email or phone already exists
       const findUserName = await User.findOne({ userName });
       const findEmail = await User.findOne({ email });

@@ -109,7 +109,7 @@ function Login() {
               className='btn-login-registration'
               href='/auth/registration'
             >
-              Or Registration Here!
+              Or Register Here!
             </Link>
           </Form>
         </div>
