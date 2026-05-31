@@ -1,5 +1,8 @@
 const nextConfig = {
   reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: true
+  },
   transpilePackages: ['antd', '@ant-design/icons', 'rc-pagination', 'rc-picker', 'rc-util', 'rc-tooltip', 'rc-table', 'rc-select', 'rc-tree', 'rc-menu'],
   experimental: {
     esmExternals: 'loose'

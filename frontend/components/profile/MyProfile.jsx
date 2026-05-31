@@ -1,13 +1,12 @@
-
 import { EditOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 import {
   Button, Descriptions, Image, Modal, Result, Skeleton, Tag, Tooltip, Upload
 } from 'antd';
 import getConfig from 'next/config';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import useFetchData from '../../hooks/useFetchData';
 import ApiService from '../../utils/apiService';
-import { getSessionToken, getSessionUser, setSessionUserKeyAgainstValue } from '../../utils/authentication';
+import { getSessionToken, setSessionUserKeyAgainstValue } from '../../utils/authentication';
 import notificationWithIcon from '../../utils/notification';
 import { userStatusAsResponse } from '../../utils/responseAsStatus';
 import ProfileEditModal from './ProfileEditModal';
@@ -18,10 +17,16 @@ const { publicRuntimeConfig } = getConfig();
 function MyProfile() {
   const [editProfileModal, setEditProfileModal] = useState(false);
   const token = getSessionToken();
-  const user = getSessionUser();
 
   // fetch user profile API data
   const [loading, error, response] = useFetchData('/api/v1/get-user');
+
+  // Sync the user verification status to session storage
+  useEffect(() => {
+    if (response?.data) {
+      setSessionUserKeyAgainstValue('verified', response.data.verified);
+    }
+  }, [response]);
 
   // handle to change user avatar upload
   const props = {
@@ -89,7 +94,7 @@ function MyProfile() {
             bordered
             extra={(
               <>
-                {!user?.verified && (
+                {response?.data && !response?.data?.verified && (
                   <Button
                     style={{ marginTop: '10px', marginRight: '20px' }}
                     onClick={handleVerifyEmail}

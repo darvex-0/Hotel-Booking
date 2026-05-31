@@ -57,23 +57,38 @@ function BookingHistory() {
   return (
     <>
       {error ? (
-        <Result
-          title='Failed to fetch'
-          subTitle={error}
-          status='500'
-          extra={(
-            <Button
-              className='gradient-primary-btn'
-              onClick={() => setFetchAgain(!fetchAgain)}
-              type='primary'
-              size='large'
-              loading={loading}
-              disabled={loading}
-            >
-              Try to Again
-            </Button>
-          )}
-        />
+        typeof error === 'string' && error.toLowerCase().includes('no bookings') ? (
+          <Result
+            title='No Bookings Yet'
+            subTitle='It looks like you haven&#39;t booked any rooms so far! Discover our beautiful rooms and book your stay today.'
+            status='info'
+            extra={(
+              <Link href='/rooms'>
+                <Button className='gradient-primary-btn' type='primary' size='large'>
+                  Browse Rooms
+                </Button>
+              </Link>
+            )}
+          />
+        ) : (
+          <Result
+            title='Failed to fetch'
+            subTitle={error}
+            status='500'
+            extra={(
+              <Button
+                className='gradient-primary-btn'
+                onClick={() => setFetchAgain(!fetchAgain)}
+                type='primary'
+                size='large'
+                loading={loading}
+                disabled={loading}
+              >
+                Try to Again
+              </Button>
+            )}
+          />
+        )
       ) : (
         <Table
           className='h-[74vh] overflow-y-scroll'

@@ -1,5 +1,5 @@
 
-import { Button } from 'antd';
+import { Button, Modal } from 'antd';
 import axios from 'axios';
 import getConfig from 'next/config';
 import Link from 'next/link';
@@ -43,6 +43,15 @@ function RoomPreview(props) {
     if (!token && !user) {
       notificationWithIcon('error', 'ERROR', 'Please Register/Login first to place an order.');
       router.push('/auth/login');
+    } else if (!user?.verified) {
+      Modal.warning({
+        title: 'Email Verification Required',
+        content: 'Please verify your email address to book a room.',
+        okText: 'Go to Profile',
+        onOk() {
+          router.push('/profile?tab=my-profile');
+        }
+      });
     } else {
       setBookingModal((prevState) => (
         { ...prevState, open: true, roomId: props?.room?.data?.id }

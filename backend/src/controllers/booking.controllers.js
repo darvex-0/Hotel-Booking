@@ -9,6 +9,15 @@ const sendBookingStatusEmail = require('../configs/send.booking.mail');
 // TODO: controller for placed booking order
 exports.placedBookingOrder = async (req, res) => {
   try {
+    // check if user email is verified
+    if (!req.user.verified) {
+      return res.status(400).json(errorResponse(
+        1,
+        'FAILED',
+        'Please verify your email address before booking a room.'
+      ));
+    }
+
     // finding by room id
     let myRoom = null;
 
