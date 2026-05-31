@@ -4,7 +4,7 @@ import { Button, Divider, Input, Modal, Steps, message } from 'antd';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Calendar } from 'react-multi-date-picker';
 import DatePanel from 'react-multi-date-picker/plugins/date_panel';
 import DatePickerHeader from 'react-multi-date-picker/plugins/date_picker_header';
@@ -20,10 +20,23 @@ function OrderPlaceModal({ bookingModal, setBookingModal }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Stable date limits to prevent calendar re-render navigation freeze
+  const minDate = useMemo(() => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }, []);
+
+  const maxDate = useMemo(() => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + 30);
+    return date;
+  }, []);
+
   // handle date change on date picker
   const handleDateChange = (dates) => {
-    const formattedDates = dates.map((date) => dayjs(date).format('YYYY-MM-DD'));
-    setSelectedDates(formattedDates);
+    setSelectedDates(dates || []);
   };
 
   // go to next step (date → payment)
@@ -58,7 +71,7 @@ function OrderPlaceModal({ bookingModal, setBookingModal }) {
       icon: <ExclamationCircleOutlined />,
       content: (
         <div style={{ marginTop: 10 }}>
-          <p><strong>Dates:</strong> {selectedDates.join(', ')}</p>
+          <p><strong>Dates:</strong> {selectedDates.map((date) => dayjs(date.toDate ? date.toDate() : date).format('YYYY-MM-DD')).join(', ')}</p>
           <p><strong>UPI ID:</strong> {upiId}</p>
           <p><strong>Transaction ID:</strong> {transactionId}</p>
         </div>
@@ -68,8 +81,9 @@ function OrderPlaceModal({ bookingModal, setBookingModal }) {
       onOk() {
         return new Promise((resolve, reject) => {
           setLoading(true);
+          const formattedDates = selectedDates.map((date) => dayjs(date.toDate ? date.toDate() : date).format('YYYY-MM-DD'));
           ApiService.post(`/api/v1/placed-booking-order/${bookingModal?.roomId}`, {
-            booking_dates: selectedDates,
+            booking_dates: formattedDates,
             upi_id: upiId.trim(),
             transaction_id: transactionId.trim()
           })
@@ -153,8 +167,8 @@ function OrderPlaceModal({ bookingModal, setBookingModal }) {
                   position='bottom'
                 />
               ]}
-              minDate={new Date(new Date()).setDate(new Date().getDate() + 1)}
-              maxDate={new Date(new Date()).setDate(new Date().getDate() + 30)}
+              minDate={minDate}
+              maxDate={maxDate}
               onChange={handleDateChange}
               value={selectedDates}
               format='YYYY/MM/DD'
@@ -236,7 +250,7 @@ function OrderPlaceModal({ bookingModal, setBookingModal }) {
             fontSize: 13,
             color: '#555'
           }}>
-            <strong>Selected Dates:</strong> {selectedDates.join(', ')}
+            <strong>Selected Dates:</strong> {selectedDates.map((date) => dayjs(date.toDate ? date.toDate() : date).format('YYYY-MM-DD')).join(', ')}
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>

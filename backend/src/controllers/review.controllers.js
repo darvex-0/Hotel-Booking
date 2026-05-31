@@ -67,17 +67,14 @@ exports.roomReviewAdd = async (req, res) => {
       ));
     }
 
-    // create a user new room review
-    const newReview = new Review({
+    // create a user new room review and save to database
+    const savedReview = await Review.create({
       user_id: req.user.id,
       room_id: myBooking.room_id,
       booking_id: req.params.id,
       rating,
       message
     });
-
-    // save the review in database
-    const savedReview = await newReview.save();
 
     // update the booking with the review ID
     myBooking.reviews = savedReview._id;

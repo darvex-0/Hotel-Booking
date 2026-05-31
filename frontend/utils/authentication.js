@@ -8,10 +8,12 @@ const APP_REFRESH_TOKEN = 'BRF-REFRESH-TOKEN';
  * @returns if session user return user object otherwise return null
  */
 export const getSessionUser = () => {
-  const userStr = localStorage.getItem(APP_USER_STORAGE);
+  if (typeof window !== 'undefined') {
+    const userStr = localStorage.getItem(APP_USER_STORAGE);
 
-  if (userStr) {
-    return JSON.parse(userStr);
+    if (userStr) {
+      return JSON.parse(userStr);
+    }
   }
   return null;
 };
@@ -21,10 +23,12 @@ export const getSessionUser = () => {
  * @returns if session user return access-token otherwise return null
  */
 export const getSessionToken = () => {
-  const tokenStr = localStorage.getItem(APP_ACCESS_TOKEN);
+  if (typeof window !== 'undefined') {
+    const tokenStr = localStorage.getItem(APP_ACCESS_TOKEN);
 
-  if (tokenStr) {
-    return tokenStr;
+    if (tokenStr) {
+      return tokenStr;
+    }
   }
   return null;
 };
@@ -34,10 +38,12 @@ export const getSessionToken = () => {
  * @returns if session user return refresh-token otherwise return null
  */
 export const getRefreshToken = () => {
-  const tokenStr = localStorage.getItem(APP_REFRESH_TOKEN);
+  if (typeof window !== 'undefined') {
+    const tokenStr = localStorage.getItem(APP_REFRESH_TOKEN);
 
-  if (tokenStr) {
-    return tokenStr;
+    if (tokenStr) {
+      return tokenStr;
+    }
   }
   return null;
 };
@@ -78,14 +84,16 @@ export const setSessionUser = (user) => {
  * @param {*} value session user object key's value
  */
 export const setSessionUserKeyAgainstValue = (key, value) => {
-  const userStr = localStorage.getItem(APP_USER_STORAGE);
-  let userStrObj = JSON.parse(userStr);
+  if (typeof window !== 'undefined') {
+    const userStr = localStorage.getItem(APP_USER_STORAGE);
+    let userStrObj = JSON.parse(userStr);
 
-  userStrObj = {
-    ...userStrObj, [key]: value
-  };
+    userStrObj = {
+      ...userStrObj, [key]: value
+    };
 
-  localStorage.setItem(APP_USER_STORAGE, JSON.stringify(userStrObj));
+    localStorage.setItem(APP_USER_STORAGE, JSON.stringify(userStrObj));
+  }
 };
 
 /**

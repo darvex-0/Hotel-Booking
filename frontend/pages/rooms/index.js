@@ -26,9 +26,9 @@ function Rooms(props) {
 
   return (
     <MainLayout title='Beach Resort ― Rooms'>
-      <Hero hero='roomsHero'>
-        <Banner title='our rooms'>
-          <Link className='btn-primary' href='/'>
+      <Hero bgImage='/images/jpeg/room-2.jpeg'>
+        <Banner title='our rooms' subtitle='elegant lodging'>
+          <Link className='btn-hero-primary' href='/'>
             return home
           </Link>
         </Banner>

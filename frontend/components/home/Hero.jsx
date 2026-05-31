@@ -6,7 +6,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import React, { useRef } from 'react';
 
-function Hero({ children }) {
+function Hero({ children, bgImage = '/images/jpeg/defaultBcg2.jpg' }) {
   const ref = useRef(null);
 
   const { scrollYProgress } = useScroll({
@@ -29,7 +29,7 @@ function Hero({ children }) {
       <motion.div
         className='hero-bg'
         style={{
-          backgroundImage: 'url("/images/jpeg/defaultBcg2.jpg")',
+          backgroundImage: `url("${bgImage}")`,
           y: backgroundY,
           scale: 1.05
         }}
