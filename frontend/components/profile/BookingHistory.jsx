@@ -206,7 +206,8 @@ function BookingHistory() {
                     </Button>
                   )}
 
-                  {(record?.booking_status === 'cancel' || record?.booking_status === 'rejected' || record?.booking_status === 'approved' || record?.booking_status === 'completed') && 'Action Not Possible!'}
+                  {(record?.booking_status === 'cancel' || record?.booking_status === 'rejected') && 'Check your email for refund info!'}
+                  {(record?.booking_status === 'approved' || record?.booking_status === 'completed') && 'Action Not Possible!'}
                 </Space>
               ),
               align: 'center'

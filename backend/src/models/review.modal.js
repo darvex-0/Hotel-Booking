@@ -104,6 +104,14 @@ const Review = {
     return Review.findById(result.insertId);
   },
 
+  findByIdAndUpdate: (id, data) => makeReviewQuery((async () => {
+    const keys = Object.keys(data);
+    const setClause = keys.map((k) => `${k} = ?`).join(', ');
+    const values = [...Object.values(data), id];
+    await pool.query(`UPDATE reviews SET ${setClause} WHERE id = ?`, values);
+    return Review.findById(id);
+  })()),
+
   find: (query = {}) => makeReviewQuery((async () => {
     const { where, values } = buildWhereClause(query);
     const [rows] = await pool.query(`SELECT * FROM reviews${where}`, values);

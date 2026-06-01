@@ -16,6 +16,7 @@ function Login() {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
+    setLoading(true);
     ApiService.post('/api/v1/auth/login', values)
       .then((response) => {
         setLoading(false);

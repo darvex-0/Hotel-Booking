@@ -256,6 +256,12 @@ exports.cancelSelfBookingOrder = async (req, res) => {
     booking.booking_status = 'cancel';
     await booking.save({ validateBeforeSave: false });
 
+    // Send cancellation email to user
+    const myRoom = await Room.findById(booking.room_id);
+    if (req.user?.email && myRoom) {
+      sendBookingStatusEmail(req.user, 'cancel', myRoom, booking.booking_dates);
+    }
+
     // success response after canceling the booking
     res.status(200).json(successResponse(
       0,

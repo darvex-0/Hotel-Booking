@@ -21,12 +21,21 @@ const sendBookingStatusEmail = async (user, bookingStatus, room, bookingDates) =
       }
     });
 
-    const isApproved = bookingStatus === 'approved';
-    const statusColor = isApproved ? '#28a745' : '#dc3545';
-    const statusText = isApproved ? 'APPROVED ✅' : 'REJECTED ❌';
-    const statusMessage = isApproved
-      ? 'Your room booking has been confirmed! We look forward to welcoming you.'
-      : 'Unfortunately, your room booking has been rejected. This may be due to payment verification failure. Please contact support or try booking again.';
+    let statusColor, statusText, statusMessage;
+
+    if (bookingStatus === 'approved') {
+      statusColor = '#28a745';
+      statusText = 'APPROVED ✅';
+      statusMessage = 'Your room booking has been confirmed! We look forward to welcoming you.';
+    } else if (bookingStatus === 'cancel') {
+      statusColor = '#ff9800';
+      statusText = 'CANCELLED ❌';
+      statusMessage = 'Your room booking has been cancelled. To process your refund, please reply to this email and share your payment proof (UPI ID, Transaction ID, or receipt screenshot) so we can verify and initiate your refund.';
+    } else {
+      statusColor = '#dc3545';
+      statusText = 'REJECTED ❌';
+      statusMessage = 'Unfortunately, your room booking has been rejected. To process your refund, please reply to this email and share your payment proof (UPI ID, Transaction ID, or receipt screenshot) so we can verify and initiate your refund.';
+    }
 
     const datesFormatted = bookingDates.map((d) => {
       const dateStr = typeof d === 'string' ? d.split('T')[0] : d;

@@ -5,21 +5,64 @@
  * @param {Array} array - The array of dates to be validated.
  * @returns {boolean} - Returns true if the array contains valid future dates without duplicates, otherwise false.
  */
+// Helper to format current date in local YYYY-MM-DD format
+const getLocalDateStringForCurrent = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// Helper to format booking dates in local/ISO YYYY-MM-DD format without timezone shifts
+const getBookingDateString = (d) => {
+  if (!d) return '';
+  const formatDateObj = (dateObj) => {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  if (d instanceof Date) {
+    return formatDateObj(d);
+  }
+  if (typeof d === 'string') {
+    // If it's a date-only string (e.g. YYYY-MM-DD), use it directly
+    if (d.length === 10 && d.indexOf('-') === 4) {
+      return d;
+    }
+    // If it's a full ISO timestamp string, parse and format in local time
+    const parsed = new Date(d);
+    if (!isNaN(parsed)) {
+      return formatDateObj(parsed);
+    }
+    return d.split('T')[0];
+  }
+  try {
+    const parsed = new Date(d);
+    if (!isNaN(parsed)) {
+      return formatDateObj(parsed);
+    }
+  } catch (e) {
+    // ignore
+  }
+  return '';
+};
+
 exports.validateBookingDates = (array) => {
   if (array.length === 0) return false; // Array should not be empty
 
-  const currentDate = new Date();
-  const uniqueDates = new Set(); // Using a Set to track unique dates
+  const currentDateStr = getLocalDateStringForCurrent();
+  const uniqueDates = new Set();
 
-  // Check if each element is a valid date and in the future, and there are no duplicates
   for (const date of array) {
-    const parsedDate = new Date(date);
-    // eslint-disable-next-line no-restricted-globals
-    if (isNaN(parsedDate) || parsedDate <= currentDate) return false;
+    const dateStr = getBookingDateString(date);
+    if (!dateStr || dateStr < currentDateStr) return false;
 
     // Check for duplicates
-    if (uniqueDates.has(parsedDate.toISOString())) return false;
-    uniqueDates.add(parsedDate.toISOString());
+    if (uniqueDates.has(dateStr)) return false;
+    uniqueDates.add(dateStr);
   }
 
   return true;
@@ -37,22 +80,29 @@ exports.validateBookingDates = (array) => {
  *   - isLatestDateOverCurrentDate: A boolean indicating if the latest date is after the current date.
  */
 exports.bookingDatesBeforeCurrentDate = (dateArray) => {
-  // Convert dates to Date objects
-  const currentDate = new Date();
+  const currentDateStr = getLocalDateStringForCurrent();
 
-  // Check if any date is in the past
-  const isAnyDateInPast = dateArray.some((dateString) => new Date(dateString) < currentDate);
+  // Check if any date is in the past (before today)
+  const isAnyDateInPast = dateArray.some((date) => {
+    const dateStr = getBookingDateString(date);
+    return dateStr < currentDateStr;
+  });
 
-  // Convert dates to Date objects and find the earliest and latest dates
-  const dateObjects = dateArray.map((dateString) => new Date(dateString));
-  const earliestDate = new Date(Math.min(...dateObjects));
-  const latestDate = new Date(Math.max(...dateObjects));
+  // Convert dates to formatted strings
+  const dateStrings = dateArray.map((date) => getBookingDateString(date)).filter(Boolean);
+  
+  // Find earliest and latest strings
+  const earliestDateStr = dateStrings.reduce((earliest, current) => current < earliest ? current : earliest, dateStrings[0] || '');
+  const latestDateStr = dateStrings.reduce((latest, current) => current > latest ? current : latest, dateStrings[0] || '');
 
-  // Check if the earliest date is over the current date
-  const isEarliestDateOverCurrentDate = earliestDate < currentDate;
+  const earliestDate = new Date(earliestDateStr);
+  const latestDate = new Date(latestDateStr);
 
-  // Check if the latest date is over the current date
-  const isLatestDateOverCurrentDate = latestDate < currentDate;
+  // Check if the earliest date is before the current date
+  const isEarliestDateOverCurrentDate = earliestDateStr < currentDateStr;
+
+  // Check if the latest date is before the current date
+  const isLatestDateOverCurrentDate = latestDateStr < currentDateStr;
 
   return {
     isAnyDateInPast,

@@ -263,6 +263,7 @@ exports.logoutUser = async (req, res) => {
 // TODO: Controller for user forgot password
 exports.forgotPassword = async (req, res) => {
   try {
+    logger.info(`Forgot password request received for email: ${req.body.email}`);
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
@@ -280,7 +281,7 @@ exports.forgotPassword = async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     // mailing data
-    const url = `${process.env.APP_SERVICE_URL}/auth/forgot-password/${resetToken}`;
+    const url = `${process.env.CLIENT_URL || 'http://localhost:3034'}/auth/forgot-password/${resetToken}`;
     const subjects = 'Password Recovery Email';
     const message = 'Click below link to reset your password. If you have not requested this email simply ignore this email.';
     const title = 'Recovery Your Password';

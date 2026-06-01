@@ -15,6 +15,7 @@ function ForgotPassword() {
   const router = useRouter();
 
   const onFinish = (values) => {
+    setLoading(true);
     ApiService.post('/api/v1/auth/forgot-password', values)
       .then((response) => {
         setLoading(false);
@@ -55,6 +56,7 @@ function ForgotPassword() {
                 prefix={<MailOutlined className='site-form-item-icon' />}
                 placeholder='Email'
                 size='large'
+                autoComplete='off'
               />
             </Form.Item>
 
