@@ -107,15 +107,15 @@ async function setupDatabase() {
 
     const userHashedPassword = await bcrypt.hash('user123', 8);
     const userData = {
-      userName: 'john',
+      userName: 'Manoop',
       fullName: 'John Doe',
-      email: 'john@example.com',
+      email: 'manoopk2060@gmail.com',
       phone: '1234567890',
       password: userHashedPassword,
       dob: '1995-05-15',
       address: '123 Guest Lane, NY',
       role: 'user',
-      verified: true,
+      verified: false,
       status: 'login'
     };
 
