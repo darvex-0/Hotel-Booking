@@ -112,6 +112,12 @@ const Review = {
     return Review.findById(id);
   })()),
 
+  findByIdAndDelete: async (id) => {
+    const review = await Review.findById(id);
+    await pool.query('DELETE FROM reviews WHERE id = ?', [id]);
+    return review;
+  },
+
   find: (query = {}) => makeReviewQuery((async () => {
     const { where, values } = buildWhereClause(query);
     const [rows] = await pool.query(`SELECT * FROM reviews${where}`, values);

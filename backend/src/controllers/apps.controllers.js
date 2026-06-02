@@ -52,6 +52,25 @@ exports.getDashboardData = async (req, res) => {
     const inReviewsBookings = await Booking.find({ booking_status: 'in-reviews' });
     const completedBookings = await Booking.find({ booking_status: 'completed' });
 
+    // Fetch bookings to calculate revenues
+    const bookingsForRevenue = await Booking.find().populate('room_id');
+    let totalRevenue = 0;
+    let pendingRevenue = 0;
+
+    if (bookingsForRevenue && bookingsForRevenue.length > 0) {
+      bookingsForRevenue.forEach((b) => {
+        const roomPrice = Number(b.room_id?.room_price) || 0;
+        const nights = b.booking_dates?.length || 0;
+        const amount = roomPrice * nights;
+
+        if (b.booking_status === 'approved' || b.booking_status === 'in-reviews' || b.booking_status === 'completed') {
+          totalRevenue += amount;
+        } else if (b.booking_status === 'pending') {
+          pendingRevenue += amount;
+        }
+      });
+    }
+
     res.status(200).json(successResponse(
       0,
       'SUCCESS',
@@ -81,6 +100,11 @@ exports.getDashboardData = async (req, res) => {
           rejected_bookings: rejectedBookings?.length || 0,
           in_reviews_bookings: inReviewsBookings?.length || 0,
           completed_bookings: completedBookings?.length || 0
+        },
+        revenue_info: {
+          total_revenue: totalRevenue,
+          pending_revenue: pendingRevenue,
+          potential_revenue: totalRevenue + pendingRevenue
         }
       }
     ));

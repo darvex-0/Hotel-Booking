@@ -98,6 +98,9 @@ exports.placedBookingOrder = async (req, res) => {
 // TODO: controller for get all specific user booking order
 exports.getBookingOrderByUserId = async (req, res) => {
   try {
+    // Run auto-checkout to update bookings in real-time
+    await require('../lib/auto.checkout')();
+
     const myBooking = await Booking.find({ booking_by: req.user.id })
       .populate('room_id')
       .populate('booking_by')
@@ -281,6 +284,9 @@ exports.cancelSelfBookingOrder = async (req, res) => {
 // TODO: controller for get all booking order by admin
 exports.getBookingOrderForAdmin = async (req, res) => {
   try {
+    // Run auto-checkout to update bookings in real-time
+    await require('../lib/auto.checkout')();
+
     const myBooking = await Booking.find()
       .populate('room_id')
       .populate('booking_by')
@@ -512,8 +518,20 @@ exports.updatedBookingOrderByAdmin = async (req, res) => {
       case 'in-reviews':
         if (booking.booking_status === 'approved') {
           if (bookingDatesBeforeCurrentDate(booking?.booking_dates).isAnyDateInPast) {
-            // update the booking status to `in-reviews`
-            booking.booking_status = 'in-reviews';
+            // Check if the user has already submitted a review for this room
+            const Review = require('../models/review.modal');
+            const userId = booking.user_id || booking.booking_by;
+            const existingReview = await Review.findOne({
+              user_id: userId,
+              room_id: booking.room_id
+            });
+
+            if (existingReview) {
+              booking.booking_status = 'completed';
+            } else {
+              // update the booking status to `in-reviews`
+              booking.booking_status = 'in-reviews';
+            }
             await booking.save({ validateBeforeSave: false });
 
             // update the room status to 'available'

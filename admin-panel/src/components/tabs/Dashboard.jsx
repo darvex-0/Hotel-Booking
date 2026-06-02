@@ -3,6 +3,7 @@ import React from 'react';
 import useFetchData from '../../hooks/useFetchData';
 import BookingCard from '../dashboard/BookingCard';
 import RoomCard from '../dashboard/RoomCard';
+import RevenueCard from '../dashboard/RevenueCard';
 import UsersCard from '../dashboard/UsersCard';
 
 function Dashboard() {
@@ -36,6 +37,11 @@ function Dashboard() {
           <BookingCard
             loading={loading}
             data={response?.data?.booking_info}
+          />
+
+          <RevenueCard
+            loading={loading}
+            data={response?.data?.revenue_info}
           />
         </div>
       )}

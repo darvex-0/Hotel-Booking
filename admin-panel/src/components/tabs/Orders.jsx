@@ -66,6 +66,9 @@ function Orders() {
                           Booked Room
                         </th>
                         <th className='data-table-head-tr-th text-center' scope='col'>
+                          Revenue
+                        </th>
+                        <th className='data-table-head-tr-th text-center' scope='col'>
                           UPI ID
                         </th>
                         <th className='data-table-head-tr-th text-center' scope='col'>
@@ -102,6 +105,9 @@ function Orders() {
                           </td>
                           <td className='data-table-body-tr-td'>
                             {data?.room?.room_name}
+                          </td>
+                          <td className={`data-table-body-tr-td text-center font-semibold ${data?.booking_status === 'cancel' || data?.booking_status === 'rejected' ? 'text-gray-400 line-through' : 'text-green-600'}`}>
+                            {`$ ${((data?.booking_status === 'cancel' || data?.booking_status === 'rejected' ? 0 : (data?.booking_dates?.length || 0)) * (Number(data?.room?.room_price) || 0)).toFixed(2)}`}
                           </td>
                           <td className='data-table-body-tr-td text-center'>
                             <span className='text-xs font-mono'>

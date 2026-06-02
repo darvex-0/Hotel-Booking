@@ -67,6 +67,20 @@ exports.roomReviewAdd = async (req, res) => {
       ));
     }
 
+    // check if user has already reviewed this room
+    const existingReview = await Review.findOne({
+      user_id: req.user.id,
+      room_id: myBooking.room_id
+    });
+
+    if (existingReview) {
+      return res.status(400).json(errorResponse(
+        1,
+        'FAILED',
+        'You have already submitted a review for this room.'
+      ));
+    }
+
     // create a user new room review and save to database
     const savedReview = await Review.create({
       user_id: req.user.id,
@@ -85,7 +99,7 @@ exports.roomReviewAdd = async (req, res) => {
     res.status(201).json(successResponse(
       0,
       'SUCCESS',
-      'Your room booking order placed successful',
+      'Your room review has been successfully submitted',
       savedReview
     ));
   } catch (error) {
@@ -245,6 +259,66 @@ exports.editSelfRoomReview = async (req, res) => {
       'SUCCESS',
       'Your room review update successful',
       updatedReview
+    ));
+  } catch (error) {
+    res.status(500).json(errorResponse(
+      2,
+      'SERVER SIDE ERROR',
+      error
+    ));
+  }
+};
+
+// TODO: controller for delete self room review
+exports.deleteSelfRoomReview = async (req, res) => {
+  try {
+    let myReview = null;
+
+    if (req.params.review_id) {
+      myReview = await Review.findById(req.params.review_id);
+    } else {
+      return res.status(400).json(errorResponse(
+        1,
+        'FAILED',
+        'Review ID is missing'
+      ));
+    }
+
+    // check review available
+    if (!myReview) {
+      return res.status(404).json(errorResponse(
+        4,
+        'NOT FOUND',
+        'Review does not exist'
+      ));
+    }
+
+    const reviewOwnerId = String(myReview.user_id?.id || myReview.user_id);
+    if (reviewOwnerId !== String(req?.user?.id)) {
+      return res.status(406).json(errorResponse(
+        6,
+        'UNABLE TO ACCESS',
+        'Sorry! You can delete only self room reviews'
+      ));
+    }
+
+    // find the booking associated with the review to revert status
+    if (myReview.booking_id) {
+      const myBooking = await Booking.findById(myReview.booking_id);
+      if (myBooking) {
+        myBooking.booking_status = 'in-reviews';
+        await myBooking.save();
+      }
+    }
+
+    // delete the review from database
+    await Review.findByIdAndDelete(req.params.review_id);
+
+    // success response with delete confirmation
+    res.status(200).json(successResponse(
+      0,
+      'SUCCESS',
+      'Your room review has been successfully deleted'
     ));
   } catch (error) {
     res.status(500).json(errorResponse(

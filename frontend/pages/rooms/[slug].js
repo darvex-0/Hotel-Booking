@@ -158,7 +158,11 @@ function RoomPreview(props) {
               {/* room reviews list */}
               <div className='single-room-images'>
                 {props?.room?.data?.id && (
-                  <RoomReviewList roomId={props?.room?.data?.id} fetchAgain={fetchAgain} />
+                  <RoomReviewList 
+                    roomId={props?.room?.data?.id} 
+                    fetchAgain={fetchAgain} 
+                    setFetchAgain={setFetchAgain} 
+                  />
                 )}
               </div>
             </section>

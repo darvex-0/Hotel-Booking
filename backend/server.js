@@ -9,5 +9,12 @@ const BASE_URL = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
 
 app.listen(PORT, () => {
   logger.info(`App server running on: ${BASE_URL}`);
+  
+  // Run auto-checkout on startup
+  const autoCheckoutBookings = require('./src/lib/auto.checkout');
+  autoCheckoutBookings();
+
+  // Run auto-checkout every 10 minutes
+  setInterval(autoCheckoutBookings, 10 * 60 * 1000);
 });
 
