@@ -193,8 +193,9 @@ function RoomPreview(props) {
 export async function getServerSideProps(ctx) {
   try {
     // Fetch data from the server-side API
+    const serverUrl = process.env.API_SERVER_BASE_URL || publicRuntimeConfig.API_BASE_URL;
     const response = await axios.get(
-      `${publicRuntimeConfig.API_BASE_URL}/api/v1/get-room-by-id-or-slug-name/${ctx.query.slug}`
+      `${serverUrl}/api/v1/get-room-by-id-or-slug-name/${ctx.query.slug}`
     );
     const room = response?.data?.result;
 

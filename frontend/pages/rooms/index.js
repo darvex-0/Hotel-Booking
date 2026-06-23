@@ -66,7 +66,8 @@ function Rooms(props) {
 export async function getServerSideProps() {
   try {
     // Fetch data from the server-side API
-    const response = await axios.get(`${publicRuntimeConfig.API_BASE_URL}/api/v1/all-rooms-list`);
+    const serverUrl = process.env.API_SERVER_BASE_URL || publicRuntimeConfig.API_BASE_URL;
+    const response = await axios.get(`${serverUrl}/api/v1/all-rooms-list`);
     const rooms = response?.data?.result;
 
     return {

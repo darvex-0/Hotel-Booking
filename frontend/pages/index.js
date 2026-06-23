@@ -124,7 +124,8 @@ function Home(props) {
 
 export async function getServerSideProps() {
   try {
-    const response = await axios.get(`${publicRuntimeConfig.API_BASE_URL}/api/v1/featured-rooms-list`);
+    const serverUrl = process.env.API_SERVER_BASE_URL || publicRuntimeConfig.API_BASE_URL;
+    const response = await axios.get(`${serverUrl}/api/v1/featured-rooms-list`);
     const featuredRooms = response?.data?.result;
 
     return {
