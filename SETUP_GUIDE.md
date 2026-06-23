@@ -23,10 +23,10 @@ Open your terminal or command prompt and run the following commands:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/Hotel-Room-Booking-System.git
+git clone https://github.com/darvex-0/Hotel-Booking.git
 
 # Navigate into the project folder
-cd Hotel-Room-Booking-System
+cd Hotel-Booking
 ```
 
 ---

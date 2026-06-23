@@ -77,8 +77,8 @@ Built with performance and aesthetics in mind, the system leverages **Next.js 13
 
 1. **Clone the Repo**
    ```bash
-   git clone https://github.com/your-username/Beach-Resort-Booking.git
-   cd Beach-Resort-Booking
+   git clone https://github.com/darvex-0/Hotel-Booking.git
+   cd Hotel-Booking
    ```
 
 2. **Backend Initialization**
